@@ -3,6 +3,7 @@ package com.lior.duel;
 import com.lior.duel.model.Duel;
 import com.lior.duel.model.Game;
 import com.lior.duel.model.Hero;
+import lombok.extern.java.Log;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,12 +17,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Log
 public class DuelApplicationTests {
 
 	@Autowired
@@ -38,6 +41,7 @@ public class DuelApplicationTests {
 		final List<Duel> duels = game.getDuels();
 		Map<String,Long> heroMapForTest = new HashMap<>();
 
+		log.info("Go over duels in game and select heroes, for game "+ game.getGameId());
 		//do the votes
 		for (Duel duel : duels) {
 			String firstHeroId = duel.getHeroes().get(0).getHeroId();
@@ -46,6 +50,7 @@ public class DuelApplicationTests {
 			assertThat(ans).isTrue();
 		}
 
+		log.info("Check correct vote values, for game "+ game.getGameId());
 		//check correct vote values
 		for (Duel duel : duels) {
 			String firstHeroId = duel.getHeroes().get(0).getHeroId();
@@ -55,6 +60,8 @@ public class DuelApplicationTests {
 		}
 
 		//get lead board
+		log.info("Get lead board after game "+ game.getGameId());
+
 		final List<Hero> leadBoard = controller.getLeadBoard();
 		assertThat(leadBoard).isNotNull();
 		assertThat(leadBoard.size()).isEqualTo(10);//TODO: take it from service configuration
@@ -115,19 +122,23 @@ public class DuelApplicationTests {
 	@Ignore
 	@Test
 	//TODO: make it work
-	public void testMultiThread(){
-		final Game game = controller.getGame();
-		final List<Duel> duels = game.getDuels();
+	public void testMultiThread() {
+		int numberOfGamesToTest = 100;
 
-		ExecutorService executorService = Executors.newFixedThreadPool(10);
+		ExecutorService executorService = Executors.newFixedThreadPool(numberOfGamesToTest/2);
 
-		executorService.execute(new Runnable() {
-			public void run() {
-				System.out.println("Asynchronous task");
-			}
-		});
+		for (int i = 0; i < numberOfGamesToTest; i++) {
+			executorService.execute(() -> {
+				testSimpleGameFlow();
+			});
+		}
 
 		executorService.shutdown();
+		try {
+			executorService.awaitTermination(10, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 	}
 
