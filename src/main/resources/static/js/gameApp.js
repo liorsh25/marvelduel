@@ -7,8 +7,8 @@ app.controller('leadboardController', leadboardController);
 
 //************************ game controller **********************
 function gameController($scope,$http,$timeout) {
-    var getGameUrl = "http://localhost:8090/duel/getGame";
-    var sendVoteUrl = "http://localhost:8090/duel/vote";
+    var getGameUrl = "/duel/getGame";
+    var sendVoteUrl = "/duel/vote";
     $scope.duelsList = [];
     $scope.currentDuel = null;
     $scope.currDuelIndex = 0;
@@ -85,7 +85,7 @@ function gameController($scope,$http,$timeout) {
 
 //************************ leadboard controller **********************
 function leadboardController($scope,$http) {
-    var getLeadBoardUrl = "http://localhost:8090/duel/getLeadBoard";
+    var getLeadBoardUrl = "/duel/getLeadBoard";
     $scope.heroesList = [];
     loadLeadBoard();
 
