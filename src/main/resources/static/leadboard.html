@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
+    <script src="js/gameApp.js"></script>
+
+    <link rel="stylesheet" href="css/duel.css">
+    <title>Hall of fame</title>
+</head>
+<body>
+<div class="container" ng-app="gameApp" ng-controller="leadboardController" ng-cloak>
+
+    <div class="logo">
+        <img src="images/logo.png">
+    </div>
+    <div class="content">
+        <h1> Hall of fame</h1>
+
+        <div class="heroData" ng-repeat="hero in heroesList">
+            <div class="nameDiv">{{hero.name}}</div>
+            <img src="{{hero.imageUrl}}">
+            <div class="leadData">
+                <div class="orderNum">Number {{$index+1}}</div>
+                <div>{{hero.votes}} Teams</div>
+            </div>
+        </div>
+
+
+        <div class="startGame"><a class="btn btn-default gameButtons" href="game.html">Start new duel!</a></div>
+    </div>
+</div>
+</body>
+</html>
