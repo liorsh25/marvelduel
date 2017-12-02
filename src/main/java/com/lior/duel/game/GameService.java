@@ -62,16 +62,45 @@ public class GameService {
         final List<Hero> heroes = heroesRandomGenerator.generateRandomHeroes(numberOfHeroesInGame);
 
         //now create the duels in the game
-        for (int i = 0; i < numberOfHeroesInGame; i = i + duelSize) {
-            List<Hero> currentHeroes = heroes.subList(i, i + duelSize);
+        duelsList = buildDuelsList(heroes);
+
+        retGame = new Game(duelsList);
+        return retGame;
+    }
+
+    public List<Game> generateSameHeroesInGames(int numberOfGames) {
+        log.info(" **** Going to create "+ numberOfGames +" games with the same heroes");
+        List<Duel> duelsList = new ArrayList<Duel>();
+        List<Game> retGames = new ArrayList<>();
+
+        //generate 5  duels heroes
+        int numberOfHeroesInGame = gameSize * duelSize;
+        final List<Hero> heroes = heroesRandomGenerator.generateRandomHeroes(numberOfHeroesInGame);
+
+        //for the same heroes list create a game
+        for (int i = 0; i < numberOfGames ; i++) {
+            //now create the duels in the game
+            duelsList = buildDuelsList(heroes);
+            Game game = new Game(duelsList);
+            log.info("Generate game with id="+ game.getGameId());
+            retGames.add(game);
+        }
+
+        return retGames;
+    }
+
+    private List<Duel> buildDuelsList(List<Hero> heroes){
+        int numberOfHeroesInGame = gameSize * duelSize;
+        List<Duel> duelsList = new ArrayList<Duel>();
+        for (int i = 0; i < numberOfHeroesInGame; i = i + this.duelSize) {
+            List<Hero> currentHeroes = heroes.subList(i, i + this.duelSize);
             Duel duel = new Duel(currentHeroes);
             duelsList.add(duel);
             //TODO: add cleanup to "OLD" duels
             duelsRepository.save(duel);
         }
 
-        retGame = new Game(duelsList);
-        return retGame;
+        return duelsList;
     }
 
     /**

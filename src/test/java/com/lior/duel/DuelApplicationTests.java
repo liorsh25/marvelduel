@@ -10,8 +10,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,25 +39,16 @@ public class DuelApplicationTests {
 	public void testSimpleGameFlow() {
 		final Game game = controller.getGame();
 		final List<Duel> duels = game.getDuels();
-		Map<String,Long> heroMapForTest = new HashMap<>();
+		Map<String,Long> countersBeforeVotes = new HashMap<>();
 
 		log.info("Go over duels in game and select heroes, for game "+ game.getGameId());
-		//do the votes
-		for (Duel duel : duels) {
-			String firstHeroId = duel.getHeroes().get(0).getHeroId();
-			saveHeroCountersBeforeVote(firstHeroId,heroMapForTest);
-			boolean ans = controller.oneVote(duel.getDuelId(), firstHeroId);
-			assertThat(ans).isTrue();
-		}
+		//save the before counters
+		countersBeforeVotes = getCountersFromBefore(duels);
+
+		performVoteForAllDuels(duels);
 
 		log.info("Check correct vote values, for game "+ game.getGameId());
-		//check correct vote values
-		for (Duel duel : duels) {
-			String firstHeroId = duel.getHeroes().get(0).getHeroId();
-			long votesBefore = heroMapForTest.get(firstHeroId);
-			long votesNow = controller.gameService.findOneHero(firstHeroId).getVotes();
-			assertThat(votesNow).isEqualTo(votesBefore+1);
-		}
+		checkCorrectVoteCounters(duels,countersBeforeVotes,1);
 
 		//get lead board
 		log.info("Get lead board after game "+ game.getGameId());
@@ -68,11 +59,38 @@ public class DuelApplicationTests {
 		//TODO: test vote value correction
 	}
 
-	private void saveHeroCountersBeforeVote(String firstHeroId, Map<String, Long> heroMapForTest) {
-		final Hero oneHero = controller.gameService.findOneHero(firstHeroId);
-		if(oneHero!=null) {
-			heroMapForTest.put(firstHeroId, oneHero.getVotes());
+	private void checkCorrectVoteCounters(List<Duel> duels, Map<String, Long> countersBeforeVotes,int incrementToTest) {
+
+		//check correct vote values
+		for (Duel duel : duels) {
+			String firstHeroId = duel.getHeroes().get(0).getHeroId();
+			long votesBefore = countersBeforeVotes.get(firstHeroId);
+			long votesNow = controller.gameService.findOneHero(firstHeroId).getVotes();
+			log.info("Check heroId "+firstHeroId+": voteNow="+votesNow+",votesBefore= "+ votesBefore+", incrementToTest="+ incrementToTest);
+
+			assertThat(votesNow).isEqualTo(votesBefore+incrementToTest);
 		}
+	}
+
+	private void performVoteForAllDuels(List<Duel> duels) {
+		//do the votes
+		for (Duel duel : duels) {
+			String firstHeroId = duel.getHeroes().get(0).getHeroId();
+			boolean ans = controller.oneVote(duel.getDuelId(), firstHeroId);
+			assertThat(ans).isTrue();
+		}
+	}
+
+	private Map<String, Long> getCountersFromBefore(List<Duel> duels){
+		Map<String, Long> retMap = new HashMap<>();
+		for (Duel duel : duels) {
+			String firstHeroId = duel.getHeroes().get(0).getHeroId();
+			final Hero oneHero = controller.gameService.findOneHero(firstHeroId);
+			if(oneHero!=null) {
+				retMap.put(firstHeroId, oneHero.getVotes());
+			}
+		}
+		return retMap;
 	}
 
 	@Test
@@ -121,23 +139,40 @@ public class DuelApplicationTests {
 
 	@Ignore
 	@Test
-	//TODO: make it work
 	public void testMultiThread() {
-		int numberOfGamesToTest = 100;
+		int numberOfGamesToTest = 50;
+		List<Game> listOfGames = new ArrayList<>();
+		Map<String,Map<String,Long>> beforeVoteCounters = new HashMap<>();
 
-		ExecutorService executorService = Executors.newFixedThreadPool(numberOfGamesToTest/2);
+		listOfGames = controller.gameService.generateSameHeroesInGames(numberOfGamesToTest);
 
-		for (int i = 0; i < numberOfGamesToTest; i++) {
+		//generate the games and save the before counters
+		for (Game game: listOfGames) {
+			Map<String,Long> beforeCounters = getCountersFromBefore(game.getDuels());
+			beforeVoteCounters.put(game.getGameId(),beforeCounters);
+		}
+
+		ExecutorService executorService = Executors.newFixedThreadPool(numberOfGamesToTest);
+
+		//vote for the first hero in each duel
+		for (Game game : listOfGames) {
 			executorService.execute(() -> {
-				testSimpleGameFlow();
+				performVoteForAllDuels(game.getDuels());
 			});
 		}
 
+		//wait for all votes to be finished
 		executorService.shutdown();
 		try {
 			executorService.awaitTermination(10, TimeUnit.MINUTES);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+
+		//check the vote counter for each game
+		for (Game game : listOfGames) {
+			//Each hero vote counter should increment in numberOfGamesToTest
+			checkCorrectVoteCounters(game.getDuels(),beforeVoteCounters.get(game.getGameId()),numberOfGamesToTest);
 		}
 
 	}
