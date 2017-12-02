@@ -39,6 +39,11 @@ public class HeroesRandomGenerator {
         return retList;
     }
 
+    /**
+     * Using MongoDB "sample" ability to get random heroes
+     * @param numberOfHeroes
+     * @return
+     */
     private List<Hero> randomHeroesFromDB(int numberOfHeroes) {
         List<Hero> retList;
         SampleOperation sampleOperation = new SampleOperation(numberOfHeroes);
@@ -48,6 +53,7 @@ public class HeroesRandomGenerator {
         return retList;
     }
 
+    @Deprecated
     private List<Hero> slowRandomHeroes(int numberOfHeroes){
         //take the hero list from DB
         //TODO: improve this (take the list from DB only once). Maybe to hold a "cache" of future games when application start (and refill it async)

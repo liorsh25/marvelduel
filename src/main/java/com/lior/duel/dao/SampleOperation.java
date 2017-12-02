@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperationCon
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.util.Assert;
 
-public class SampleOperation implements AggregationOperation  {
+public class SampleOperation implements AggregationOperation {
 
     private int size;
 

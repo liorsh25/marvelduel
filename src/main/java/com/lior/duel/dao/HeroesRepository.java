@@ -9,6 +9,4 @@ import java.util.List;
 
 
 public interface HeroesRepository extends MongoRepository<Hero, String> {
-    @Query("{$sample: {size: ?0} }")
-    List<Hero> findRandomHeroes(int numberOfHeroesInGame);
 }

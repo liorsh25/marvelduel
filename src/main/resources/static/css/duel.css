@@ -32,18 +32,17 @@ div.heroToSelect a img{
      color: white !important;
 }
 
-
 .progress {
-position: relative;
-background: rgba(43, 40, 40, 1);
-border-radius: 0px;
-height: 25px;
-width: 40%;
-margin: 20px auto 20px auto;
+    position: relative;
+    background: rgba(43, 40, 40, 1);
+    border-radius: 0px;
+    height: 25px;
+    width: 40%;
+    margin: 20px auto 20px auto;
 }
 
 .progress-bar {
-background: rgba(31, 218, 18, 1);
+    background: rgba(31, 218, 18, 1);
 }
 
 .startGame{
@@ -71,11 +70,11 @@ background: rgba(31, 218, 18, 1);
 }
 
 .leadData{
-padding-top:10px;
+    padding-top:10px;
 }
 
 .orderNum{
-font-size: 18px;
+    font-size: 18px;
 }
 
 
@@ -88,11 +87,11 @@ font-size: 18px;
 }
 
 .greenMark{
-background-color: #1FDA12;
+    background-color: #1FDA12;
 }
 
 .redMark{
-background-color: #FF0000;
+    background-color: #FF0000;
 }
 
 .circle {
@@ -100,7 +99,7 @@ background-color: #FF0000;
 	width: 70px;
 	height: 70px;
 	font-size: 50px;
-	    margin: auto;
+	margin: auto;
 
 }
 
@@ -118,14 +117,14 @@ background-color: #FF0000;
     height: 108%;
     background: rgba(0,0,0,0.5);
     text-align: center;
-    }
+}
 
 .markDiv {
    margin-top: 120px;
 }
 
 .heroClick{
-text-decoration: none !important;
+    text-decoration: none !important;
 }
 
 .progressValue {
@@ -137,5 +136,5 @@ text-decoration: none !important;
 }
 
 .progressValue span{
-vertical-align: middle;
+    vertical-align: middle;
 }
